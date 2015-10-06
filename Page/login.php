@@ -1,11 +1,12 @@
 <?php
 
 	// LOGIN.PHP
+	require_once("functions.php");
 	
-	//loon andmebaasi ühenduse
-	require_once("../../config.php");
-	$database = "if15_siim_3";
-	$mysqli = new mysqli($servername,$username,$password,$database);
+	//kui kasutaja on sisseloginud,siis suunan data.php lehele
+	if(isset($_SESSION["logged_in_user_id"])){
+		header("Location: data.php");
+	}
 	
 	//muutujad errorite jaoks
 	$email_error = "";
@@ -56,27 +57,11 @@
 			if($password_error == "" && $email_error == ""){
 				echo "Võib sisse logida! Kasutajanimi on ".$email." ja parool on ".$password;
 			
-				$hash = hash("sha512", $password);
-				
-				$stmt = $mysqli->prepare("SELECT id,email FROM users WHERE email=? AND password=? ");
-				$stmt->bind_param("ss",$email,$hash);
-				
-				//muutujuad tulemustele
-				$stmt->bind_result($id_from_db, $email_from_db);
-				$stmt->execute();
-				
-				//kontrollin kas tulemusi leiti
-				if($stmt->fetch()){
-					//ab's oli midagi
-					echo " Email ja parool õiged, kasutaja id=".$id_from_db;
-				}else{
-					//ei leidnud
-					echo "Wrong credentials";
-				}
-				$stmt->close();
-			}
-			
+				$hash = hash("sha512", $password);	
+				loginUser($email,$hash);				
+			}	
 		}
+	
 	
 		//Kasutaja loomine
 		if(isset($_POST["submit"])){
@@ -131,18 +116,13 @@
 				
 				echo "Võib kasutajat luua! Kasutajanimi on ".$create_email." ja parool on ".$create_password." ja räsi on ".$hash.$fname.$lname;
 				
-				// salvestame andmebaasi
-				$stmt = $mysqli->prepare("INSERT INTO users(email,password,first_name,last_name,age,city) VALUES (?,?,?,?,?,?)");
-				echo $mysqli->error;
- 				echo $stmt->error;
-				//asendame ? märgid, ss - s on string email, s on string password,i on integer
-				$stmt->bind_param("ssssis",$create_email,$hash,$fname,$lname,$age,$city);
-				$stmt->execute();
-				$stmt->close();
-			
-			
+				createUser($create_email,$hash,$fname,$lname,$age,$city);
+				
+						
 		}
 	}
+	
+	
 function test_input($data) {
 	//võtab ära tühikud,enterid jne
 	$data = trim($data);
@@ -152,8 +132,7 @@ function test_input($data) {
 	$data = htmlspecialchars($data);
 	return $data;
 	}
-	//paneme ühenduse kinni
-	$mysqli->close();
+
 	
 
 ?>
