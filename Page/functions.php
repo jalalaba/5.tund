@@ -61,7 +61,18 @@
 			$stmt = $mysqli->prepare("INSERT INTO car_plates(user_id,number_plate,color) VALUES (?,?,?)");
 			//asendame ? märgid, ss - s on string email, s on string password,i on integer
 			$stmt->bind_param("iss",$_SESSION["logged_in_user_id"],$car_plate,$car_color);
-			$stmt->execute();
+			
+			//sõnum
+			$message="";
+			if($stmt->execute()){
+				//kui on tõene,siis insertn õnnestus
+				$message="Sai edukalt lisatud";
+			}else{
+				//kui on väär kuvame errori
+				echo $stmt->error;
+			}
+			return $message;
+			
 			$stmt->close();
 			$mysqli->close();	
 	}

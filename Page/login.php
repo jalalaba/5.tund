@@ -55,7 +55,6 @@
 			
 			// Kui oleme siia jõudnud, võime kasutaja sisse logida
 			if($password_error == "" && $email_error == ""){
-				echo "Võib sisse logida! Kasutajanimi on ".$email." ja parool on ".$password;
 			
 				$hash = hash("sha512", $password);	
 				loginUser($email,$hash);				
@@ -70,12 +69,12 @@
 				$fname_error = "see väli on kohustulik";
 			}else{
 				$fname=test_input($_POST["first_name"]);
-			};
+			}
 			if (empty($_POST["last_name"])){
 				$lname_error = "see väli on kohustulik";
 			}else{
 				$lname=test_input($_POST["last_name"]);
-			};
+			}
 			if (empty($_POST["create_email"])){
 				$create_email_error = " see väli on kohustulik";			
 			} else {
